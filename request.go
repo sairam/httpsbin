@@ -34,7 +34,6 @@ type IncomingRequest struct {
 	Method     string `yaml:"method"`
 	ReceivedAt int64  `yaml:"received_at"`
 	Request    []byte `yaml:"request,flow"`
-	// Body       []byte `yaml:"body,flow"`
 }
 
 type IncomingRequestDisplay struct {
@@ -148,7 +147,7 @@ func RetrieveLatestFromBin(bin string, count int) []IncomingRequestDisplay {
 		intFilename, _ := strconv.ParseInt(fileName, 10, 64)
 		reference := time.Unix(intFilename, 0).Format(time.RFC1123)
 		ir := &IncomingRequest{}
-		ir.Load(strings.Join([]string{bin, fi.Name()}, string(os.PathSeparator)))
+		ir.Load(MergeOSPath(bin, fi.Name()))
 		ird := convertToView(ir)
 		files = append(files, IncomingRequestDisplay{reference, intFilename, ird})
 	}

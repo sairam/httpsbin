@@ -5,6 +5,8 @@ import (
 	"io"
 	"io/ioutil"
 	"math/rand"
+	"os"
+	"strings"
 	"time"
 )
 
@@ -62,4 +64,8 @@ func readCompressedFileIO(file io.ReadCloser) ([]byte, error) {
 	}
 
 	return data, nil
+}
+
+func MergeOSPath(data ...string) string {
+	return strings.Join(data, string(os.PathSeparator))
 }

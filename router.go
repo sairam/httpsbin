@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
@@ -42,13 +41,13 @@ func InitRouter() {
 }
 
 func echoHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("echo")
+	log.Println("op: echo")
 
 	r.Write(w)
 }
 
 func createBinHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("createBin")
+	log.Println("op: createBin")
 
 	dir, err := createNewDir(RandString(7))
 	if err != nil {
@@ -63,7 +62,7 @@ func createBinHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, dir+"?"+inspectQueryString, 302)
 }
 func binPersistHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("binPersist")
+	log.Println("op: binPersist")
 
 	bin := mux.Vars(r)["bin"]
 	// ignore if there is a . in the request
@@ -79,13 +78,14 @@ func binPersistHandler(w http.ResponseWriter, r *http.Request) {
 
 	ir := newRequest(r)
 	fi := fmt.Sprintf("%d", time.Now().Unix())
-	fileName := strings.Join([]string{bin, fi}, string(os.PathSeparator))
+	fileName := MergeOSPath(bin, fi)
 	ir.Save(fileName)
 	w.Write([]byte("ok"))
+	go CleanUpMaxItemsInDir(bin)
 }
 
 func binViewHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("binView")
+	log.Println("op: binView")
 	bin := mux.Vars(r)["bin"]
 	ok, err := ifDirExists(bin)
 	if !ok || err != nil {
@@ -107,7 +107,7 @@ type BinItem struct {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Home Page")
+	log.Println("op: Home Page")
 	var rv []BinItem
 	rv = append(rv, BinItem{"gQfOuZf", 2})
 	rv = append(rv, BinItem{"aaaaaaa", 0})
