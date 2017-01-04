@@ -66,6 +66,7 @@ func readCompressedFileIO(file io.ReadCloser) ([]byte, error) {
 	return data, nil
 }
 
+// MergeOSPath makes a string by merging based on os.PathSeparator
 func MergeOSPath(data ...string) string {
 	return strings.Join(data, string(os.PathSeparator))
 }

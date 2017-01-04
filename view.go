@@ -7,12 +7,14 @@ import (
 	"github.com/sairam/kinli"
 )
 
+// InitView ..
 func InitView() {
 	kinli.ViewFuncs = template.FuncMap{}
 	kinli.CacheMode = false // remove for production
 	kinli.InitTmpl()
 }
 
+// DisplayPage ..
 func DisplayPage(w io.Writer, path string, ctx interface{}) {
 	page := &kinli.Page{
 		Title:   "Home Page",

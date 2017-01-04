@@ -1,6 +1,9 @@
 package main
 
-import "sync"
+import (
+	"os"
+	"sync"
+)
 
 // AppConfig configuration to start the server
 type AppConfig struct {
@@ -27,11 +30,13 @@ func InitConfig() {
 }
 
 func (config *AppConfig) init() {
-	config.DataDir = "data/"
-	config.Persistence = "filesystem" // optional "inmemory". DataDir is ignored if inmemory
-	Config.LocalServer = "localhost:3000"
-	Config.ServerProto = "http"
-	Config.ServerHost = "localhost:3000"
+	config.DataDir = os.Getenv("DATA_DIR")        // "data/"
+	config.Persistence = os.Getenv("PERSISTENCE") // "filesystem" / optional "inmemory". DataDir is ignored if inmemory
+
+	Config.LocalServer = os.Getenv("LOCALSERVER")  // "localhost:3000"
+	Config.ServerProto = os.Getenv("SERVER_PROTO") // "http"
+	Config.ServerHost = os.Getenv("SERVER_HOST")   // "localhost:3000"
+
 	Config.CleanupStrategy = "idle"
 	Config.CleanupAfter = 6 * 60 * 60 // in seconds, 6 hours
 	Config.MaxFilesToDisplay = 20

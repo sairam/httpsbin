@@ -17,6 +17,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+// IncomingRequestView ..
 type IncomingRequestView struct {
 	FromIP     string
 	URL        string
@@ -36,6 +37,7 @@ type IncomingRequest struct {
 	Request    []byte `yaml:"request,flow"`
 }
 
+// IncomingRequestDisplay ..
 type IncomingRequestDisplay struct {
 	Display   string
 	Reference int64
