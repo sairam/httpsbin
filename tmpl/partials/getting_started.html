@@ -1,0 +1,82 @@
+{{ $pageurl := "https://httpsb.in/abc" }}
+<h4>Make a request to get started. After making a request, refresh this page to see it.</h4>
+
+      <h5 style="font-weight: bold">cURL</h5>
+      <pre><code class="language-bash">curl -X POST -d "fizz=buzz" {{ $pageurl }}</code></pre>
+
+      <h5 style="font-weight: bold">Python (with Requests)</h5>
+      <pre><code class="language-python">import requests, time
+r = requests.post('{{ $pageurl }}', data={"ts":time.time()})
+print r.status_code
+print r.content</code></pre>
+
+      <h5 style="font-weight: bold">Node.js (with request)</h5>
+      <pre><code class="language-js">var request = require('request');
+var url ='{{ $pageurl }}'
+request(url, function (error, response, body) {
+  if (!error) {
+    console.log(body);
+  }
+});</code></pre>
+
+      <h5 style="font-weight: bold">Ruby</h5>
+      <pre><code class="language-ruby">require 'open-uri'
+result = open('{{ $pageurl }}')
+result.lines { |f| f.each_line {|line| p line} }</code></pre>
+
+      <h5 style="font-weight: bold">C# / .NET (4.5+)</h5>
+      <pre><code class="language-cs">using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+namespace HttpBinExample
+{
+  class Program
+  {
+    static void Main(string[] args)
+    {
+      var task = MakeRequest();
+      task.Wait();
+
+      var response = task.Result;
+      var body = response.Content.ReadAsStringAsync().Result;
+      Console.WriteLine(body);
+    }
+
+    private static async Task&lt;HttpResponseMessage&gt; MakeRequest()
+    {
+      var httpClient = new HttpClient();
+      return await httpClient.GetAsync(new Uri("{{ $pageurl }}"));
+    }
+  }
+}</code></pre>
+
+      <h5 style="font-weight: bold">Java</h5>
+      <pre><code class="language-java">import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.methods.*;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+
+import java.io.*;
+
+public class HttpBinTutorial {
+  public static void main(String[] args) {
+    HttpClient client = new HttpClient();
+    GetMethod method = new GetMethod("{{ $pageurl }}");
+    try {
+      int statusCode = client.executeMethod(method);
+      byte[] responseBody = method.getResponseBody();
+      System.out.println(new String(responseBody));
+    } catch (Exception e) {
+      System.err.println("Fatal error: " + e.getMessage());
+      e.printStackTrace();
+    } finally {
+      method.releaseConnection();
+    }
+  }
+}</code></pre>
+
+      <h5 style="font-weight: bold">PHP</h5>
+      <pre><code class="language-php">&lt;?php
+    $result = file_get_contents('{{ $pageurl }}');
+    echo $result;
+?&gt;</code></pre>

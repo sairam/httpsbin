@@ -1,0 +1,38 @@
+{{ partial "header" . }}
+<div class="text-center">
+
+<h1>Inspect HTTP Requests securely</h1>
+<h2> and relay them too</h2>
+
+<br>
+<div class="row">
+  <div class="col-md-offset-2 col-md-7">
+    <br><br>
+    <h4>
+    HttpBin gives you a URL that will collect requests made to it and let you inspect them in a human-friendly way. <br><br>
+    Use HttpBin to see what your HTTP client is sending or to inspect and debug webhook requests.
+    </h4>
+
+    <br><br>
+    <form method="POST" action="/bin">
+    <button type="submit" class="btn btn-primary btn-lg">Create a HttpBin</button>
+    </form>
+  </div>
+  {{ with .Context }}
+  {{ $count := len .RecentlyViewed}}
+  {{ if ne $count 0 }}
+  <div class="col-md-offset-0 col-md-1 text-left">
+    <h4 class="text-center" style="font-weight: bold;">Recent Bins</h4>
+    <ul class="list-group">
+      {{ range $a, $bin := .RecentlyViewed }}
+      <li class="list-group-item"><a href="/{{$bin.Path}}?inspect">{{$bin.Path}}</a> ({{$bin.Count}})</li>{{ end }}
+    </ul>
+  </div>
+  {{ end }}
+  {{ end }}
+</div>
+
+
+
+</div>
+{{ partial "footer" . }}

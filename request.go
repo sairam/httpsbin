@@ -17,6 +17,16 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
+type IncomingRequestView struct {
+	FromIP     string
+	URL        string
+	Method     string
+	ReceivedAt int64
+	Headers    []string
+	Body       string
+	Length     int64
+}
+
 // IncomingRequest is the incoming request on the wire
 type IncomingRequest struct {
 	FromIP     string `yaml:"fromip"`
@@ -24,8 +34,21 @@ type IncomingRequest struct {
 	Method     string `yaml:"method"`
 	ReceivedAt int64  `yaml:"received_at"`
 	Request    []byte `yaml:"request,flow"`
-	Body       []byte `yaml:"body,flow"`
+	// Body       []byte `yaml:"body,flow"`
 }
+
+type IncomingRequestDisplay struct {
+	Display   string
+	Reference int64
+	IncomingRequestView
+}
+
+// ByInt ..
+type ByInt []IncomingRequestDisplay
+
+func (a ByInt) Len() int           { return len(a) }
+func (a ByInt) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByInt) Less(i, j int) bool { return a[i].Reference < a[j].Reference }
 
 func newRequest(r *http.Request) *IncomingRequest {
 	var err error
@@ -46,11 +69,9 @@ func newRequest(r *http.Request) *IncomingRequest {
 
 func readRequest(ir *IncomingRequest) {
 	a, _ := http.ReadRequest(bufio.NewReader(bytes.NewReader(ir.Request)))
-	// body.(io.ReadCloser)
-	if ir.Body != nil {
-		a.Body = ioutil.NopCloser(bytes.NewReader(ir.Body))
-	}
-	fmt.Printf("%+v\n", a)
+	t, _ := ioutil.ReadAll(a.Body)
+	fmt.Println(a)
+	fmt.Println(t)
 }
 
 // Load data from the file
@@ -89,34 +110,47 @@ func (ir *IncomingRequest) Save(fileName string) {
 	writeCompressedFileIO(file, out)
 }
 
-type IncomingRequestDisplay struct {
-	Display   string
-	Reference int64
-	*IncomingRequest
+func convertToView(ir *IncomingRequest) IncomingRequestView {
+	irv := IncomingRequestView{
+		FromIP:     ir.FromIP,
+		URL:        ir.URL,
+		Method:     ir.Method,
+		ReceivedAt: ir.ReceivedAt,
+	}
+	var headers []string
+
+	request, _ := http.ReadRequest(bufio.NewReader(bytes.NewReader(ir.Request)))
+	for k, v := range request.Header {
+		t := fmt.Sprintf("%s: %s", k, strings.Join(v, "; "))
+		headers = append(headers, t)
+	}
+	irv.Headers = headers
+
+	if request.Body != nil {
+		body, _ := ioutil.ReadAll(request.Body)
+		irv.Body = string(body)
+	}
+	irv.Length = request.ContentLength
+
+	return irv
 }
 
-// ByInt ..
-type ByInt []*IncomingRequestDisplay
-
-func (a ByInt) Len() int           { return len(a) }
-func (a ByInt) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a ByInt) Less(i, j int) bool { return a[i].Reference < a[j].Reference }
-
 // RetrieveLatestFromBin ..
-func RetrieveLatestFromBin(bin string, count int) []*IncomingRequestDisplay {
+func RetrieveLatestFromBin(bin string, count int) []IncomingRequestDisplay {
 	fis, err := fsutil.ReadDir(bin)
 	if err != nil {
 		log.Print(err)
-		return []*IncomingRequestDisplay{}
+		return []IncomingRequestDisplay{}
 	}
-	files := make([]*IncomingRequestDisplay, 0, len(fis))
+	files := make([]IncomingRequestDisplay, 0, len(fis))
 	for _, fi := range fis {
 		fileName := fi.Name()
 		intFilename, _ := strconv.ParseInt(fileName, 10, 64)
 		reference := time.Unix(intFilename, 0).Format(time.RFC1123)
 		ir := &IncomingRequest{}
 		ir.Load(strings.Join([]string{bin, fi.Name()}, string(os.PathSeparator)))
-		files = append(files, &IncomingRequestDisplay{reference, intFilename, ir})
+		ird := convertToView(ir)
+		files = append(files, IncomingRequestDisplay{reference, intFilename, ird})
 	}
 	sort.Sort(sort.Reverse(ByInt(files)))
 

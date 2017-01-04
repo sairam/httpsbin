@@ -1,0 +1,28 @@
+</div>
+</div>
+<footer class="text-center">
+  <hr>
+  &copy; <a href="https://github.com/sairam" rel="me">sairam</a> 2017 | built with <span class="glyphicon glyphicon-heart" style="color: red" aria-hidden="true"></span><span class="sr-only">love</span> in <a href="https://golang.org">Golang</a><br/>
+
+  <a href="mailto:{{index .ClientConfig "EmailContact"}}">Feedback</a> |
+  <a href="https://github.com/sairam/httpsbin" target="_blank"> OpenSource </a>
+  <!-- <a href="https://sairam.xyz/" target="_blank" rel="none"> Blog Post </a> -->
+  <br>  
+
+  <br>
+</footer>
+
+{{ $ga := index .ClientConfig "GoogleAnalytics" }}
+{{ if ne $ga "" }}
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', '{{$ga}}', 'auto');
+ga('send', 'pageview');
+</script>
+{{ end }}
+</body>
+</html>

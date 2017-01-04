@@ -6,5 +6,6 @@ func main() {
 	InitPersist()
 
 	go CleanStaleFiles()
+	InitView()
 	InitRouter()
 }

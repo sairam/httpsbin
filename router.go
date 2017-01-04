@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
 )
+
+const inspectQueryString = "inspect"
 
 // InitRouter initialises the routes to handle
 func InitRouter() {
@@ -23,7 +26,7 @@ func InitRouter() {
 	r.HandleFunc("/new", createBinHandler).Methods("GET") // unexposed feature
 	r.HandleFunc("/echo", echoHandler)
 
-	r.HandleFunc("/{bin}", binViewHandler).Methods("GET").Queries("inspect", "")
+	r.HandleFunc("/{bin}", binViewHandler).Methods("GET").Queries(inspectQueryString, "")
 	r.HandleFunc("/{bin}", binPersistHandler)
 
 	r.HandleFunc("/", homeHandler).Methods("GET")
@@ -57,8 +60,7 @@ func createBinHandler(w http.ResponseWriter, r *http.Request) {
 			// well, we tried
 		}
 	}
-	http.Redirect(w, r, dir, 302)
-	// create a name, make a directory and redirect to the link
+	http.Redirect(w, r, dir+"?"+inspectQueryString, 302)
 }
 func binPersistHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("binPersist")
@@ -72,11 +74,14 @@ func binPersistHandler(w http.ResponseWriter, r *http.Request) {
 	ok, err := ifDirExists(bin)
 	if !ok || err != nil {
 		http.NotFound(w, r)
+		return
 	}
 
 	ir := newRequest(r)
-	fileName := fmt.Sprintf("%s/%d", bin, time.Now().Unix())
+	fi := fmt.Sprintf("%d", time.Now().Unix())
+	fileName := strings.Join([]string{bin, fi}, string(os.PathSeparator))
 	ir.Save(fileName)
+	w.Write([]byte("ok"))
 }
 
 func binViewHandler(w http.ResponseWriter, r *http.Request) {
@@ -85,11 +90,22 @@ func binViewHandler(w http.ResponseWriter, r *http.Request) {
 	ok, err := ifDirExists(bin)
 	if !ok || err != nil {
 		http.NotFound(w, r)
+		return
 	}
 	irds := RetrieveLatestFromBin(bin, 10)
-	fmt.Printf("%+v", irds)
+	DisplayPage(w, "bin", &struct{ BinData []IncomingRequestDisplay }{irds})
+}
+
+// BinItem displayed on home page
+type BinItem struct {
+	Path  string
+	Count int
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Home Page")
+	var rv []BinItem
+	rv = append(rv, BinItem{"gQfOuZf", 2})
+	rv = append(rv, BinItem{"aaaaaaa", 0})
+	DisplayPage(w, "home", &struct{ RecentlyViewed []BinItem }{rv})
 }

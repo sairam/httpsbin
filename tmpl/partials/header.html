@@ -1,0 +1,46 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+  <link rel="dns-prefetch" href="//fonts.googleapis.com">
+
+  <link type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+
+  <link type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/railscasts.min.css" rel="stylesheet" crossorigin="anonymous">
+
+  <link href="//fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+  <link type="image/x-icon" rel="icon" href="/favicon.ico">
+
+  <style type="text/css">
+
+  body {
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    margin: 0px auto;
+    padding: 50px;
+  }
+  p.pre {
+    font-family: monospace;
+    word-break: break-all;
+  }
+
+  .logo {
+    font-variant: small-caps;
+    letter-spacing: 1px;
+    text-decoration: underline;
+  }
+
+  </style>
+  {{ $wn := index .ClientConfig "WebsiteName" }}
+  <title> {{ $wn }} </title>
+
+  <meta property="og:title" content="{{ $wn }}"/>
+  <meta name="description"  content="{{ $wn }} consumes and displays requests sent">
+  <meta property="og:description" content="{{ $wn }} is highly secured tool to debug HTTP based requests"/>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+</head>
+<body>
+  <div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
