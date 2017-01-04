@@ -4,9 +4,13 @@ import "sync"
 
 // AppConfig configuration to start the server
 type AppConfig struct {
-	DataDir           string
-	Persistence       string
-	LocalServer       string
+	DataDir     string
+	Persistence string
+
+	ServerProto string
+	ServerHost  string
+	LocalServer string
+
 	CleanupStrategy   string
 	CleanupAfter      int
 	MaxFilesToDisplay int
@@ -26,6 +30,8 @@ func (config *AppConfig) init() {
 	config.DataDir = "data/"
 	config.Persistence = "filesystem" // optional "inmemory". DataDir is ignored if inmemory
 	Config.LocalServer = "localhost:3000"
+	Config.ServerProto = "http"
+	Config.ServerHost = "localhost:3000"
 	Config.CleanupStrategy = "idle"
 	Config.CleanupAfter = 6 * 60 * 60 // in seconds, 6 hours
 	Config.MaxFilesToDisplay = 20

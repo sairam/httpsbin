@@ -93,7 +93,11 @@ func binViewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	irds := RetrieveLatestFromBin(bin, 10)
-	DisplayPage(w, "bin", &struct{ BinData []IncomingRequestDisplay }{irds})
+	pageURL := Config.ServerProto + "://" + Config.ServerHost + "/" + bin
+	DisplayPage(w, "bin", &struct {
+		ThisPageURL string
+		BinData     []IncomingRequestDisplay
+	}{pageURL, irds})
 }
 
 // BinItem displayed on home page
