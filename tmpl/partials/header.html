@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
@@ -33,14 +34,19 @@
   {{ $wn := index .ClientConfig "WebsiteName" }}
   <title> {{ $wn }} </title>
 
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Sai Ram Kunala">
+
   <meta property="og:title" content="{{ $wn }}"/>
   <meta name="description"  content="{{ $wn }} consumes and displays requests sent">
   <meta property="og:description" content="{{ $wn }} is highly secured tool to debug HTTP based requests"/>
 
+  <meta property="og:locale" content="en_US">
+  <meta property="og:type" content="website">
+
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js"></script>
   <script>hljs.initHighlightingOnLoad();</script>
   <script type="text/javascript" src="/static/js/recentbins.js"></script>
-
 </head>
 <body>
   <div class="row">

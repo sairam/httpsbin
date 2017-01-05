@@ -3,6 +3,7 @@ binary_name: httpsbin
 build:
   main: ./main.go
 files:
+  - static/js/recentbins.js
   - tmpl/bin.html
   - tmpl/home.html
   - tmpl/partials/header.html
