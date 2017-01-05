@@ -1,11 +1,12 @@
 package main
 
-// import _ "github.com/sairam/httpsbin"
-func main() {
-	InitConfig()
-	InitPersist()
+import bin "./httpsbin"
 
-	go CleanStaleFiles()
-	InitView()
-	InitRouter()
+func main() {
+	bin.InitConfig()
+	bin.InitPersist()
+
+	go bin.CleanStaleFiles()
+	bin.InitView()
+	bin.InitRouter()
 }

@@ -1,4 +1,4 @@
-package main
+package httpsbin
 
 import (
 	"bufio"
@@ -26,6 +26,7 @@ type IncomingRequestView struct {
 	Headers    []string
 	Body       string
 	Length     int64
+	// Scheme     string
 }
 
 // IncomingRequest is the incoming request on the wire
@@ -137,6 +138,9 @@ func convertToView(ir *IncomingRequest) IncomingRequestView {
 }
 
 // RetrieveLatestFromBin ..
+// TODO - split this up into two methods.
+// 1. taking the files to display
+// 2. loading the data from the files
 func RetrieveLatestFromBin(bin string, count int) []IncomingRequestDisplay {
 	fis, err := fsutil.ReadDir(bin)
 	if err != nil {
