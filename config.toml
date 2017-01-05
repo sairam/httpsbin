@@ -1,0 +1,8 @@
+data_dir = "data/"
+persistence = "filesystem"
+
+server_proto = "http"
+server_host = "localhost:3003"
+server_local = "localhost:3003"
+
+cache = true

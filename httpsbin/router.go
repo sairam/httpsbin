@@ -36,6 +36,7 @@ func InitRouter() {
 		WriteTimeout: 60 * time.Second,
 		ReadTimeout:  60 * time.Second,
 	}
+	log.Println("server is running on", Config.LocalServer)
 
 	log.Fatal(srv.ListenAndServe())
 }

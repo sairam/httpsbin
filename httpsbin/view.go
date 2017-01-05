@@ -10,7 +10,7 @@ import (
 // InitView ..
 func InitView() {
 	kinli.ViewFuncs = template.FuncMap{}
-	kinli.CacheMode = false // remove for production
+	kinli.CacheMode = Config.CacheView
 	kinli.InitTmpl()
 }
 
