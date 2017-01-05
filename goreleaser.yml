@@ -1,0 +1,12 @@
+repo: sairam/httpsbin
+binary_name: httpsbin
+build:
+  main: ./main.go
+files:
+  - tmpl/bin.html
+  - tmpl/home.html
+  - tmpl/partials/header.html
+  - tmpl/partials/footer.html
+  - tmpl/partials/getting_started.html
+  - config.toml
+  - README.md
