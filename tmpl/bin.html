@@ -47,4 +47,10 @@
   </div>
 </div>
 
+{{ $b := .Context.BinInfo }}
+<script>
+AddToRecent("{{$b.Path}}", "{{$b.Name}}", {{$b.ExpiresAt}}, {{$b.Count}});
+</script>
+
+
 {{ partial "footer" . }}

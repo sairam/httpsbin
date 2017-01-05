@@ -19,20 +19,17 @@
     </form>
   </div>
   {{ with .Context }}
-  {{ $count := len .RecentlyViewed}}
-  {{ if ne $count 0 }}
-  <div class="col-md-offset-0 col-md-1 text-left">
+  <div class="col-md-2 text-left">
     <h4 class="text-center" style="font-weight: bold;">Recent Bins</h4>
-    <ul class="list-group">
-      {{ range $a, $bin := .RecentlyViewed }}
-      <li class="list-group-item"><a href="/{{$bin.Path}}?inspect">{{$bin.Path}}</a> ({{$bin.Count}})</li>{{ end }}
+    <ul class="list-group" id="recentbins">
     </ul>
   </div>
   {{ end }}
-  {{ end }}
 </div>
 
-
+<script>
+RenderRecentBins("recentbins");
+</script>
 
 </div>
 {{ partial "footer" . }}

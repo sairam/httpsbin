@@ -21,6 +21,9 @@ func InitRouter() {
 		http.ServeFile(w, r, "favicon.ico")
 	})
 
+	s := http.StripPrefix("/static/", http.FileServer(http.Dir("./static/")))
+	r.PathPrefix("/static/").Handler(s)
+
 	r.HandleFunc("/bin", createBinHandler).Methods("POST")
 	r.HandleFunc("/new", createBinHandler).Methods("GET") // unexposed feature
 	r.HandleFunc("/echo", echoHandler)
@@ -95,22 +98,24 @@ func binViewHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	irds := RetrieveLatestFromBin(bin, 10)
 	pageURL := Config.ServerProto + "://" + Config.ServerHost + "/" + bin
+
+	binitem := BinItem{bin, len(irds), time.Now().Unix() + 60*60*24, ""}
 	DisplayPage(w, "bin", &struct {
 		ThisPageURL string
 		BinData     []IncomingRequestDisplay
-	}{pageURL, irds})
+		BinInfo     BinItem
+	}{pageURL, irds, binitem})
 }
 
 // BinItem displayed on home page
 type BinItem struct {
-	Path  string
-	Count int
+	Path      string
+	Count     int
+	ExpiresAt int64
+	Name      string
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("op: Home Page")
-	var rv []BinItem
-	rv = append(rv, BinItem{"gQfOuZf", 2})
-	rv = append(rv, BinItem{"aaaaaaa", 0})
-	DisplayPage(w, "home", &struct{ RecentlyViewed []BinItem }{rv})
+	DisplayPage(w, "home", &struct{}{})
 }
