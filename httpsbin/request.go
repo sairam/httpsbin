@@ -128,6 +128,12 @@ func searchFromBin(dir string, queryStr string) (*bleve.SearchResult, error) {
 	return searchResult, err
 }
 
+// DeleteFromIndex deletes an IR based on filename as it indexes
+func DeleteFromIndex(dir string, fileName string) {
+	index, _ := bleveIndex(dir)
+	index.Delete(fileName)
+}
+
 // Index indexes data ithe directory name
 func (ir *IncomingRequest) Index(dir string, fileName string) {
 	index, _ := bleveIndex(dir)
@@ -202,9 +208,9 @@ func RetrieveLatestFromBin(bin string, count int) []IncomingRequestDisplay {
 	}
 	sort.Sort(sort.Reverse(ByInt(files)))
 
-	if len(fis) > Config.MaxFilesToDisplay {
-		go CleanUpMaxItemsInDir(bin)
-	}
+	// if len(fis) > Config.MaxFilesToDisplay {
+	// 	go CleanUpMaxItemsInDir(bin)
+	// }
 
 	return files
 }

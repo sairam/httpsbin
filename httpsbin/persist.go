@@ -64,7 +64,7 @@ func CleanUpMaxItemsInDir(dir string) {
 		log.Println(err)
 		return
 	}
-	if len(fis) <= Config.MaxFilesToDisplay {
+	if len(fis) <= Config.MaxFilesToDisplay+1 {
 		// not gonna try to cleanup
 		return
 	}
@@ -85,6 +85,7 @@ func CleanUpMaxItemsInDir(dir string) {
 
 	if len(filelist) > Config.MaxFilesToDisplay {
 		for _, ir := range filelist[Config.MaxFilesToDisplay:] {
+			DeleteFromIndex(dir, ir.Name)
 			fsutil.Remove(MergeOSPath(dir, ir.Name))
 		}
 	}
