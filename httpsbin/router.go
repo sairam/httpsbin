@@ -84,6 +84,8 @@ func binPersistHandler(w http.ResponseWriter, r *http.Request) {
 	fi := fmt.Sprintf("%d", time.Now().Unix())
 	fileName := MergeOSPath(bin, fi)
 	ir.Save(fileName)
+	ir.Index(bin, fi)
+
 	w.Write([]byte("ok"))
 	go CleanUpMaxItemsInDir(bin)
 }
@@ -96,10 +98,18 @@ func binViewHandler(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	irds := RetrieveLatestFromBin(bin, 10)
+	inspectOps := r.URL.Query()["inspect"]
+	var irds []IncomingRequestDisplay
+	var total int
+	if inspectOps[0] == "" {
+		irds = RetrieveLatestFromBin(bin, 10)
+		total = len(irds)
+	} else {
+		irds, total = SearchInBin(bin, inspectOps[0])
+	}
 	pageURL := Config.ServerProto + "://" + Config.ServerHost + "/" + bin
 
-	binitem := BinItem{bin, len(irds), time.Now().Unix() + 60*60*24, ""}
+	binitem := BinItem{bin, total, time.Now().Unix() + 60*60*24, "", inspectOps[0]}
 	DisplayPage(w, "bin", &struct {
 		ThisPageURL string
 		BinData     []IncomingRequestDisplay
@@ -113,6 +123,7 @@ type BinItem struct {
 	Count     int
 	ExpiresAt int64
 	Name      string
+	Query     string
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {

@@ -14,6 +14,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/blevesearch/bleve"
+
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -36,6 +38,7 @@ type IncomingRequest struct {
 	Method     string `yaml:"method"`
 	ReceivedAt int64  `yaml:"received_at"`
 	Request    []byte `yaml:"request,flow"`
+	RequestStr string `yaml:"requeststr,flow"`
 }
 
 // IncomingRequestDisplay ..
@@ -62,6 +65,7 @@ func newRequest(r *http.Request) *IncomingRequest {
 	}
 
 	ir.Request, err = httputil.DumpRequest(r, true)
+	ir.RequestStr = string(ir.Request)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -94,6 +98,41 @@ func (ir *IncomingRequest) Load(fileName string) {
 	if err = yaml.Unmarshal(out, &ir); err != nil {
 		fmt.Println("Error loading data ", err)
 	}
+}
+
+// Config.DataDir should be considered only when persistence is set to disk. see persist.go
+func bleveIndex(dir string) (bleve.Index, error) {
+	var index bleve.Index
+	var err error
+
+	if Config.Persistence == persistenceFs {
+		path := MergeOSPath(Config.DataDir, dir, ".index.db")
+		if index, err = bleve.Open(path); err != nil {
+			mapping := bleve.NewIndexMapping()
+			index, err = bleve.New(path, mapping)
+		}
+	} else {
+		mapping := bleve.NewIndexMapping()
+		index, err = bleve.NewMemOnly(mapping)
+		// maintain a hash in memory for tests
+	}
+	return index, err
+}
+
+// searchFromBin within the dir
+func searchFromBin(dir string, queryStr string) (*bleve.SearchResult, error) {
+	index, _ := bleveIndex(dir)
+	query := bleve.NewQueryStringQuery(queryStr)
+	searchRequest := bleve.NewSearchRequest(query)
+	searchResult, err := index.Search(searchRequest)
+	return searchResult, err
+}
+
+// Index indexes data ithe directory name
+func (ir *IncomingRequest) Index(dir string, fileName string) {
+	index, _ := bleveIndex(dir)
+	irv := convertToView(ir)
+	index.Index(fileName, irv)
 }
 
 // Save data from structure into file
@@ -149,11 +188,15 @@ func RetrieveLatestFromBin(bin string, count int) []IncomingRequestDisplay {
 	}
 	files := make([]IncomingRequestDisplay, 0, len(fis))
 	for _, fi := range fis {
+		if fi.IsDir() {
+			continue
+		}
 		fileName := fi.Name()
+
 		intFilename, _ := strconv.ParseInt(fileName, 10, 64)
 		reference := time.Unix(intFilename, 0).Format(time.RFC1123)
 		ir := &IncomingRequest{}
-		ir.Load(MergeOSPath(bin, fi.Name()))
+		ir.Load(MergeOSPath(bin, fileName))
 		ird := convertToView(ir)
 		files = append(files, IncomingRequestDisplay{reference, intFilename, ird})
 	}
@@ -164,4 +207,35 @@ func RetrieveLatestFromBin(bin string, count int) []IncomingRequestDisplay {
 	}
 
 	return files
+}
+
+// SearchInBin ..
+func SearchInBin(bin, query string) ([]IncomingRequestDisplay, int) {
+	result, err := searchFromBin(bin, query)
+
+	fis, _ := fsutil.ReadDir(bin)
+	total := len(fis) - 1
+	if total < 0 {
+		total = 0
+	}
+
+	if err != nil || result.Hits.Len() == 0 {
+		return []IncomingRequestDisplay{}, total
+	}
+
+	files := make([]IncomingRequestDisplay, 0, result.Hits.Len())
+	for _, hit := range result.Hits {
+		fi := hit.ID
+		fileName := MergeOSPath(fi)
+
+		// copied from RetrieveLatestFromBin
+		intFilename, _ := strconv.ParseInt(fileName, 10, 64)
+		reference := time.Unix(intFilename, 0).Format(time.RFC1123)
+		ir := &IncomingRequest{}
+		ir.Load(MergeOSPath(bin, fileName))
+		ird := convertToView(ir)
+		files = append(files, IncomingRequestDisplay{reference, intFilename, ird})
+	}
+
+	return files, total
 }

@@ -21,6 +21,7 @@ func InitPersist() {
 	var appFs afero.Fs
 	if Config.Persistence == persistenceFs {
 		appFs = afero.NewBasePathFs(afero.NewOsFs(), Config.DataDir)
+		appFs.MkdirAll("", 0700)
 	} else {
 		appFs = afero.NewMemMapFs()
 	}
@@ -70,6 +71,9 @@ func CleanUpMaxItemsInDir(dir string) {
 
 	filelist := make([]*FileItem, 0, len(fis))
 	for _, fi := range fis {
+		if fi.IsDir() {
+			continue
+		}
 		fileitem := &FileItem{fi.Name(), 0}
 		if err := fileitem.ParseTime(); err == nil {
 			filelist = append(filelist, fileitem)
