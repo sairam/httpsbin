@@ -1,5 +1,8 @@
-repo: sairam/httpsbin
-binary_name: httpsbin
+release:
+  github: 
+    owner: sairam
+    name: httpsbin
+binary: httpsbin
 build:
   main: ./main.go
 files:
